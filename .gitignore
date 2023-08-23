@@ -1,0 +1,40 @@
+# Ignore Composer dependencies
+/vendor/
+
+# Ignore build artifacts
+/build/
+/dist/
+
+# Ignore configuration files that may contain sensitive information
+/config/*.php
+
+# Ignore environment-specific files
+.env
+
+# Ignore logs and cache
+/log/
+/cache/
+
+# Ignore temporary files
+/tmp/
+*.tmp
+*.swp
+*.swo
+
+# Ignore editor-specific files
+.idea/
+.vscode/
+
+# Ignore project-specific files
+*.iml
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore backup files
+*.bak
+*.backup
+
+# Ignore PHPStorm files
+.phpstorm.meta.php
