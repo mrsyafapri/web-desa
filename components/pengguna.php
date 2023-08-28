@@ -163,11 +163,11 @@ class PenggunaView
                                 <input type="hidden" name="id" value="<?= $result->id; ?>">
                                 <div class=" card-body">
                                     <div class="form-group">
-                                        <label for="username" class="form-label">Username:</label>
+                                        <label for="username" class="form-label">Username: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" value="<?= $result->username; ?>" required autofocus>
                                     </div>
                                     <div class="form-group">
-                                        <label for="password" class="form-label">Password:</label>
+                                        <label for="password" class="form-label">Password: <i class="text-danger">*</i></label>
                                         <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" value="<?= $result->password; ?>" required>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@ class PenggunaView
                                         } else {
                                             ?>
                                             <tr>
-                                                <td colspan="4" class="text-center">Tidak ada</td>
+                                                <td colspan="4" class="text-center">Tidak ada data</td>
                                             </tr>
                                         <?php
                                         }
@@ -291,7 +291,7 @@ class PenggunaView
             });
 
             function confirmDelete(id) {
-                if (confirm("Apakah anda yakin ingin menghapus pengguna ini?")) {
+                if (confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
                     window.open("<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/delete/" + id, '_self');
                 }
             }

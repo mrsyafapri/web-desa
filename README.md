@@ -11,6 +11,7 @@ Web Desa Teluk Jira merupakan sebuah website yang dibuat untuk memenuhi program 
 - [x] Perangkat Desa
 - [x] Badan Permusyawaratan Desa
 - [x] Kegiatan Desa
+- [x] Lokasi Desa
 
 ## Teknologi
 
@@ -23,11 +24,16 @@ Web Desa Teluk Jira merupakan sebuah website yang dibuat untuk memenuhi program 
 
 ## Cara Penggunaan
 
-1. Clone repository ini
+1. Clone/Download repository ini dan extract ke dalam folder `htdocs` atau `www` pada web server yang digunakan
 2. Buat database dengan nama `desa_teluk_jira`
 3. Import file `desa_teluk_jira.sql` ke dalam database yang telah dibuat
 4. Buka file `includes/configuration.php` dan sesuaikan konfigurasi database dan url yang akan digunakan
 5. Buka url `http://localhost/web-desa` atau sesuaikan dengan siteUrl yang telah dibuat pada file `includes/configuration.php`
+
+## Akun Admin
+
+- Username: admin
+- Password: admin
 
 ## Kontributor
 

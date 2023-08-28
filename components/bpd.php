@@ -51,9 +51,11 @@ class BPDModel
     public $id = 0;
     public $nama = "";
     public $jabatan = "";
+    public $no_sk = "";
     public $foto = "";
     public $awal_masa_bakti = "";
     public $akhir_masa_bakti = "";
+    public $no_hp = "";
 
     public function selectAll()
     {
@@ -61,7 +63,7 @@ class BPDModel
 
         $sql = "SELECT *
                 FROM bpd
-                ORDER BY nama";
+                ORDER BY id";
         $result = $app->queryArrayOfObjects($sql);
 
         return $result;
@@ -93,8 +95,10 @@ class BPDModel
         $id = isset($_REQUEST["id"]) ? intval($_REQUEST["id"]) : 0;
         $nama = isset($_REQUEST["nama"]) ? $_REQUEST["nama"] : "";
         $jabatan = isset($_REQUEST["jabatan"]) ? $_REQUEST["jabatan"] : "";
+        $no_sk = isset($_REQUEST["no_sk"]) ? $_REQUEST["no_sk"] : "";
         $awal_masa_bakti = isset($_REQUEST["awal_masa_bakti"]) ? $_REQUEST["awal_masa_bakti"] : "";
         $akhir_masa_bakti = isset($_REQUEST["akhir_masa_bakti"]) ? $_REQUEST["akhir_masa_bakti"] : "";
+        $no_hp = isset($_REQUEST["no_hp"]) ? $_REQUEST["no_hp"] : "";
 
         // File Upload Handling
         $foto = "";
@@ -120,30 +124,51 @@ class BPDModel
 
         if ($id == 0) {
             // data tidak ditemukan maka insert
-            $sql = "INSERT INTO bpd(nama, jabatan, foto, awal_masa_bakti, akhir_masa_bakti)
-                    VALUES(:nama, :jabatan, :foto, :awal_masa_bakti, :akhir_masa_bakti)";
+            $sql = "INSERT INTO bpd(nama, jabatan, no_sk, foto, awal_masa_bakti, akhir_masa_bakti, no_hp)
+                    VALUES(:nama, :jabatan, :no_sk, :foto, :awal_masa_bakti, :akhir_masa_bakti, :no_hp)";
             $params = array(
                 ":nama" => $nama,
                 ":jabatan" => $jabatan,
+                ":no_sk" => $no_sk,
                 ":foto" => $foto,
                 ":awal_masa_bakti" => $awal_masa_bakti,
                 ":akhir_masa_bakti" => $akhir_masa_bakti,
+                ":no_hp" => $no_hp,
             );
             $app->query($sql, $params);
         } else {
-            // data ditemukan maka update
-            $sql = "UPDATE bpd
-                    SET nama=:nama, jabatan=:jabatan, foto=:foto, awal_masa_bakti=:awal_masa_bakti, akhir_masa_bakti=:akhir_masa_bakti
-                    WHERE id=:id";
-            $params = array(
-                ":id" => $id,
-                ":nama" => $nama,
-                ":jabatan" => $jabatan,
-                ":foto" => $foto,
-                ":awal_masa_bakti" => $awal_masa_bakti,
-                ":akhir_masa_bakti" => $akhir_masa_bakti,
-            );
-            $app->query($sql, $params);
+            if ($foto == "") {
+                // foto tidak diubah
+                $sql = "UPDATE bpd
+                        SET nama=:nama, jabatan=:jabatan, no_sk=:no_sk, awal_masa_bakti=:awal_masa_bakti, akhir_masa_bakti=:akhir_masa_bakti, no_hp=:no_hp
+                        WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":jabatan" => $jabatan,
+                    ":no_sk" => $no_sk,
+                    ":awal_masa_bakti" => $awal_masa_bakti,
+                    ":akhir_masa_bakti" => $akhir_masa_bakti,
+                    ":no_hp" => $no_hp,
+                );
+                $app->query($sql, $params);
+            } else {
+                // foto diubah
+                $sql = "UPDATE bpd
+                        SET nama=:nama, jabatan=:jabatan, no_sk=:no_sk, foto=:foto, awal_masa_bakti=:awal_masa_bakti, akhir_masa_bakti=:akhir_masa_bakti, no_hp=:no_hp
+                        WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":jabatan" => $jabatan,
+                    ":no_sk" => $no_sk,
+                    ":foto" => $foto,
+                    ":awal_masa_bakti" => $awal_masa_bakti,
+                    ":akhir_masa_bakti" => $akhir_masa_bakti,
+                    ":no_hp" => $no_hp,
+                );
+                $app->query($sql, $params);
+            }
         }
 
         $view = new BPDView();
@@ -203,24 +228,32 @@ class BPDView
                                 <input type="hidden" name="id" value="<?= $result->id; ?>">
                                 <div class=" card-body">
                                     <div class="form-group">
-                                        <label for="nama" class="form-label">Nama:</label>
+                                        <label for="nama" class="form-label">Nama: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama" value="<?= $result->nama; ?>" required autofocus>
                                     </div>
                                     <div class=" form-group">
-                                        <label for="jabatan" class="form-label">Jabatan:</label>
+                                        <label for="jabatan" class="form-label">Jabatan: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="jabatan" name="jabatan" placeholder="Masukkan jabatan" value="<?= $result->jabatan; ?>" required>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="foto" class="form-label">Foto Profil:</label>
-                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                                    <div class=" form-group">
+                                        <label for="no_sk" class="form-label">No. SK: <i class="text-danger">*</i></label>
+                                        <input type="text" class="form-control" id="no_sk" name="no_sk" placeholder="Masukkan nomor SK" value="<?= $result->no_sk; ?>" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="awal_masa_bakti" class="form-label">Awal Masa Bakti:</label>
-                                        <input type="number" min="0000" max="2099" class="form-control" id="awal_masa_bakti" name="awal_masa_bakti" placeholder="Masukkan awal masa bakti" value="<?= $result->awal_masa_bakti; ?>">
+                                        <label for="foto" class="form-label">Foto Profil: <i class="text-danger">*</i></label>
+                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*" <?= $result->id == 0 ? "required" : ""; ?>>
                                     </div>
                                     <div class="form-group">
-                                        <label for="akhir_masa_bakti" class="form-label">Akhir Masa Bakti:</label>
-                                        <input type="number" min="0000" max="2099" class="form-control" id="akhir_masa_bakti" name="akhir_masa_bakti" placeholder="Masukkan akhir masa bakti" value="<?= $result->akhir_masa_bakti; ?>">
+                                        <label for="awal_masa_bakti" class="form-label">Awal Masa Bakti: <i class="text-danger">*</i></label>
+                                        <input type="number" min="0000" max="2099" class="form-control" id="awal_masa_bakti" name="awal_masa_bakti" placeholder="Masukkan awal masa bakti" value="<?= $result->awal_masa_bakti; ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="akhir_masa_bakti" class="form-label">Akhir Masa Bakti: <i class="text-danger">*</i></label>
+                                        <input type="number" min="0000" max="2099" class="form-control" id="akhir_masa_bakti" name="akhir_masa_bakti" placeholder="Masukkan akhir masa bakti" value="<?= $result->akhir_masa_bakti; ?>" required>
+                                    </div>
+                                    <div class=" form-group">
+                                        <label for="no_hp" class="form-label">No. HP: <i class="text-danger">*</i></label>
+                                        <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Masukkan nomor HP" value="<?= $result->no_hp; ?>" maxlength="13" required>
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -279,12 +312,14 @@ class BPDView
                                 </div>
                             </div>
                             <div class="card-body">
-                                <table id="example2" class="table table-bordered table-hover">
+                                <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Nama</th>
                                             <th>Jabatan</th>
+                                            <th>No. SK</th>
                                             <th>Masa Bakti</th>
+                                            <th>No. HP</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -301,8 +336,13 @@ class BPDView
                                                         <?= $obj->jabatan; ?>
                                                     </td>
                                                     <td>
-                                                        <?= $obj->awal_masa_bakti; ?> -
-                                                        <?= $obj->akhir_masa_bakti; ?>
+                                                        <?= $obj->no_sk; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $obj->awal_masa_bakti; ?> - <?= $obj->akhir_masa_bakti; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $obj->no_hp; ?>
                                                     </td>
                                                     <td>
                                                         <a href="<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/edit/<?= $obj->id; ?>" class="badge btn-info">
@@ -318,7 +358,7 @@ class BPDView
                                         } else {
                                             ?>
                                             <tr>
-                                                <td colspan="4" class="text-center">Tidak ada</td>
+                                                <td colspan="6" class="text-center">Tidak ada data</td>
                                             </tr>
                                         <?php
                                         }
@@ -334,19 +374,16 @@ class BPDView
         <!-- Page specific script -->
         <script>
             $(function() {
-                $('#example2').DataTable({
-                    "paging": true,
-                    "lengthChange": false,
-                    "searching": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
+                $("#example1").DataTable({
                     "responsive": true,
-                });
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             });
 
             function confirmDelete(id) {
-                if (confirm("Apakah anda yakin ingin menghapus pengguna ini?")) {
+                if (confirm("Apakah Anda yakin ingin menghapus BPD ini?")) {
                     window.open("<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/delete/" + id, '_self');
                 }
             }
@@ -379,10 +416,10 @@ class BPDView
                     ?>
                             <div class="col-lg-3 col-sm-6 col-12">
                                 <!-- START: Card Perangkat -->
-                                <div class="card card-cascade my-bg-primary text-white">
-                                    <!-- Card image -->
+                                <div class="card card-cascade my-bg-secondary text-white">
+                                    <!-- Card image have same height -->
                                     <div class="view view-cascade overlay">
-                                        <img class="card-img-top card-profile-img" src="<?= $app->siteUrl; ?>/uploads/bpd/<?= $obj->foto; ?>" alt="Card image cap">
+                                        <img class="card-img-top card-profile-img" src="<?= $app->siteUrl; ?>/uploads/bpd/<?= $obj->foto; ?>" alt="BPD Profil">
                                         <a>
                                             <div class="mask rgba-white-slight"></div>
                                         </a>
@@ -394,9 +431,13 @@ class BPDView
                                             <?= $obj->nama; ?>
                                         </h4>
                                         <!-- Subtitle -->
-                                        <h6 class="font-weight-bold indigo-text py-2">
+                                        <h6 class="font-weight-bold indigo-text pt-2">
                                             <?= $obj->jabatan; ?>
                                         </h6>
+                                    </div>
+                                    <!-- Card footer -->
+                                    <div class="card-footer text-white text-center">
+                                        <p class="mb-0"><?= $obj->awal_masa_bakti; ?> - <?= $obj->akhir_masa_bakti; ?></p>
                                     </div>
                                 </div>
                                 <!-- END: Card Perangkat -->

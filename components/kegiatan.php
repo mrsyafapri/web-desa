@@ -42,7 +42,7 @@ class KegiatanController
     {
         $model = new KegiatanModel();
         $view = new KegiatanView();
-        $view->list($model->selectAll());
+        $view->list($model->selectAllPublikasi());
     }
 
     public function detail()
@@ -63,7 +63,21 @@ class KegiatanModel
     public $lokasi = "";
     public $deskripsi = "";
     public $foto = "";
+    public $video = "";
     public $publikasi = 0;
+
+    public function selectAllPublikasi()
+    {
+        global $app;
+
+        $sql = "SELECT *
+                FROM kegiatan
+                WHERE publikasi=1
+                ORDER BY id DESC";
+        $result = $app->queryArrayOfObjects($sql);
+
+        return $result;
+    }
 
     public function selectAll()
     {
@@ -71,7 +85,7 @@ class KegiatanModel
 
         $sql = "SELECT *
                 FROM kegiatan
-                ORDER BY nama";
+                ORDER BY id DESC";
         $result = $app->queryArrayOfObjects($sql);
 
         return $result;
@@ -105,6 +119,7 @@ class KegiatanModel
         $waktu = isset($_REQUEST["waktu"]) ? trim($_REQUEST["waktu"]) : "";
         $lokasi = isset($_REQUEST["lokasi"]) ? trim($_REQUEST["lokasi"]) : "";
         $deskripsi = isset($_REQUEST["deskripsi"]) ? trim($_REQUEST["deskripsi"]) : "";
+        $video = isset($_REQUEST["video"]) ? trim($_REQUEST["video"]) : "";
         $publikasi = isset($_REQUEST["publikasi"]) ? intval($_REQUEST["publikasi"]) : 0;
 
         // File Upload Handling
@@ -129,35 +144,53 @@ class KegiatanModel
             }
         }
 
-        // TODO: Penyimpanan data harus mengecek apakah data sudah lengkap dan dalam format yang sesuai
-
         if ($id == 0) {
-            $sql = "INSERT INTO kegiatan (nama, waktu, lokasi, deskripsi, foto, publikasi)
-                VALUES (:nama, :waktu, :lokasi, :deskripsi, :foto, :publikasi)";
+            $sql = "INSERT INTO kegiatan (nama, waktu, lokasi, deskripsi, foto, video, publikasi)
+                    VALUES (:nama, :waktu, :lokasi, :deskripsi, :foto, :video, :publikasi)";
             $params = array(
                 ":nama" => $nama,
                 ":waktu" => $waktu,
                 ":lokasi" => $lokasi,
                 ":deskripsi" => $deskripsi,
                 ":foto" => $foto,
+                ":video" => $video,
                 ":publikasi" => $publikasi,
             );
             $app->query($sql, $params);
         } else {
             // data ditemukan maka update
-            $sql = "UPDATE kegiatan
-                SET nama=:nama, waktu=:waktu, lokasi=:lokasi, deskripsi=:deskripsi, foto=:foto, publikasi=:publikasi
-                WHERE id=:id";
-            $params = array(
-                ":id" => $id,
-                ":nama" => $nama,
-                ":waktu" => $waktu,
-                ":lokasi" => $lokasi,
-                ":deskripsi" => $deskripsi,
-                ":foto" => $foto,
-                ":publikasi" => $publikasi,
-            );
-            $app->query($sql, $params);
+            if ($foto == "") {
+                // foto tidak diubah
+                $sql = "UPDATE kegiatan
+                    SET nama=:nama, waktu=:waktu, lokasi=:lokasi, deskripsi=:deskripsi, video=:video, publikasi=:publikasi
+                    WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":waktu" => $waktu,
+                    ":lokasi" => $lokasi,
+                    ":deskripsi" => $deskripsi,
+                    ":video" => $video,
+                    ":publikasi" => $publikasi,
+                );
+                $app->query($sql, $params);
+            } else {
+                // foto diubah
+                $sql = "UPDATE kegiatan
+                    SET nama=:nama, waktu=:waktu, lokasi=:lokasi, deskripsi=:deskripsi, foto=:foto, video=:video, publikasi=:publikasi
+                    WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":waktu" => $waktu,
+                    ":lokasi" => $lokasi,
+                    ":deskripsi" => $deskripsi,
+                    ":foto" => $foto,
+                    ":video" => $video,
+                    ":publikasi" => $publikasi,
+                );
+                $app->query($sql, $params);
+            }
         }
 
         $view = new KegiatanView();
@@ -232,28 +265,32 @@ class KegiatanView
                                 <input type="hidden" name="id" value="<?= $result->id; ?>">
                                 <div class=" card-body">
                                     <div class="form-group">
-                                        <label for="nama" class="form-label">Nama Kegiatan:</label>
+                                        <label for="nama" class="form-label">Nama Kegiatan: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama kegiatan" value="<?= $result->nama; ?>" required autofocus>
                                     </div>
                                     <div class="form-group">
-                                        <label for="waktu" class="form-label">Tanggal Kegiatan:</label>
+                                        <label for="waktu" class="form-label">Tanggal Kegiatan: <i class="text-danger">*</i></label>
                                         <input type="datetime-local" class="form-control" id="waktu" name="waktu" placeholder="Masukkan waktu kegiatan" value="<?= $result->waktu; ?>" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="lokasi" class="form-label">Lokasi Kegiatan:</label>
+                                        <label for="lokasi" class="form-label">Lokasi Kegiatan: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="lokasi" name="lokasi" placeholder="Masukkan lokasi kegiatan" value="<?= $result->lokasi; ?>" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="deskripsi" class="form-label">Deskripsi Kegiatan:</label>
+                                        <label for="deskripsi" class="form-label">Deskripsi Kegiatan: <i class="text-danger">*</i></label>
                                         <textarea id="deskripsi" name="deskripsi" class="form-control" rows="5" placeholder="Masukkan deskripsi kegiatan" required><?= $result->deskripsi; ?></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label for="foto" class="form-label">Foto Kegiatan:</label>
-                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                                        <label for="foto" class="form-label">Foto Kegiatan: <i class="text-danger">*</i></label>
+                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*" <?= $result->id == 0 ? "required" : ""; ?>>
                                     </div>
                                     <div class="form-group">
-                                        <label for="publikasi" class="form-label">Publikasi:</label>
-                                        <input type="checkbox" id="publikasi" class="form-control" name="publikasi" value="1" <?php echo $result->publikasi == 1 ? "checked" : ""; ?>>
+                                        <label for="video" class="form-label">Video Kegiatan:</label>
+                                        <input type="text" class="form-control" id="video" name="video" placeholder="Masukkan link video kegiatan" value="<?= $result->video; ?>">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="publikasi" class="form-label">Publikasi: <i class="text-danger">*</i></label>
+                                        <input type="checkbox" id="publikasi" class="form-control" name="publikasi" value="1" <?php echo $result->publikasi == 1 ? "checked" : ""; ?> required>
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -320,7 +357,7 @@ class KegiatanView
                                 </div>
                             </div>
                             <div class="card-body">
-                                <table id="example2" class="table table-bordered table-hover">
+                                <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Nama Kegiatan</th>
@@ -362,7 +399,7 @@ class KegiatanView
                                         } else {
                                             ?>
                                             <tr>
-                                                <td colspan="4" class="text-center">Tidak ada</td>
+                                                <td colspan="4" class="text-center">Tidak ada data</td>
                                             </tr>
                                         <?php
                                         }
@@ -378,19 +415,16 @@ class KegiatanView
         <!-- Page specific script -->
         <script>
             $(function() {
-                $('#example2').DataTable({
-                    "paging": true,
-                    "lengthChange": false,
-                    "searching": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
+                $("#example1").DataTable({
                     "responsive": true,
-                });
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             });
 
             function confirmDelete(id) {
-                if (confirm("Apakah anda yakin ingin menghapus kegiatan ini?")) {
+                if (confirm("Apakah Anda yakin ingin menghapus kegiatan ini?")) {
                     window.open("<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/delete/" + id, '_self');
                 }
             }
@@ -472,6 +506,15 @@ class KegiatanView
             <div class="row">
                 <div class="col-5">
                     <img src="<?= $app->siteUrl; ?>/uploads/kegiatan/<?= $result->foto; ?>" class="img-fluid rounded" alt="Foto Kegiatan">
+                    <!-- video url -->
+                    <?php
+                    if ($result->video != "") {
+                    ?>
+                        <a href="<?= $result->video; ?>" class="btn btn-primary mt-3" target="_blank">
+                            <i class="fab fa-youtube"></i>
+                            Lihat Video Kegiatan
+                        </a>
+                    <?php } ?>
                 </div>
                 <div class="col-7">
                     <h1 class="fw-bold">
@@ -484,6 +527,10 @@ class KegiatanView
                     <span class="badge bg-success">
                         <i class="fas fa-clock ml-2"></i>
                         <?= date("H:i", strtotime($result->waktu)) . " WIB"; ?>
+                    </span>
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <?= $result->lokasi; ?>
                     </span>
                     <p class="mt-3">
                         <?= $result->deskripsi; ?>

@@ -53,7 +53,10 @@ class PerangkatModel
     public $tempat_lahir = "";
     public $tanggal_lahir = "";
     public $jabatan = "";
+    public $no_hp = "";
+    public $no_sk = "";
     public $alamat = "";
+    public $nipd = "";
     public $foto = "";
     public $periode_awal = "";
     public $periode_akhir = "";
@@ -64,7 +67,7 @@ class PerangkatModel
 
         $sql = "SELECT *
                 FROM perangkat_desa
-                ORDER BY nama";
+                ORDER BY id";
         $result = $app->queryArrayOfObjects($sql);
 
         return $result;
@@ -98,7 +101,10 @@ class PerangkatModel
         $tempat_lahir = isset($_REQUEST["tempat_lahir"]) ? $_REQUEST["tempat_lahir"] : "";
         $tanggal_lahir = isset($_REQUEST["tanggal_lahir"]) ? $_REQUEST["tanggal_lahir"] : "";
         $jabatan = isset($_REQUEST["jabatan"]) ? $_REQUEST["jabatan"] : "";
+        $no_hp = isset($_REQUEST["no_hp"]) ? $_REQUEST["no_hp"] : "";
+        $no_sk = isset($_REQUEST["no_sk"]) ? $_REQUEST["no_sk"] : "";
         $alamat = isset($_REQUEST["alamat"]) ? $_REQUEST["alamat"] : "";
+        $nipd = isset($_REQUEST["nipd"]) ? $_REQUEST["nipd"] : "";
         $periode_awal = isset($_REQUEST["periode_awal"]) ? $_REQUEST["periode_awal"] : "";
         $periode_akhir = isset($_REQUEST["periode_akhir"]) ? $_REQUEST["periode_akhir"] : "";
 
@@ -126,36 +132,63 @@ class PerangkatModel
 
         if ($id == 0) {
             // data tidak ditemukan maka insert
-            $sql = "INSERT INTO perangkat_desa(nama, tempat_lahir, tanggal_lahir, jabatan, alamat, foto, periode_awal, periode_akhir)
-                    VALUES(:nama, :tempat_lahir, :tanggal_lahir, :jabatan, :alamat, :foto, :periode_awal, :periode_akhir)";
+            $sql = "INSERT INTO perangkat_desa(nama, tempat_lahir, tanggal_lahir, jabatan, no_hp, no_sk, alamat, nipd, foto, periode_awal, periode_akhir)
+                    VALUES(:nama, :tempat_lahir, :tanggal_lahir, :jabatan, :no_hp, :no_sk, :alamat, :nipd, :foto, :periode_awal, :periode_akhir)";
             $params = array(
                 ":nama" => $nama,
                 ":tempat_lahir" => $tempat_lahir,
                 ":tanggal_lahir" => $tanggal_lahir,
                 ":jabatan" => $jabatan,
+                ":no_hp" => $no_hp,
+                ":no_sk" => $no_sk,
                 ":alamat" => $alamat,
+                ":nipd" => $nipd,
                 ":foto" => $foto,
                 ":periode_awal" => $periode_awal,
                 ":periode_akhir" => $periode_akhir,
             );
             $app->query($sql, $params);
         } else {
-            // data ditemukan maka update
-            $sql = "UPDATE perangkat_desa
-                    SET nama=:nama, tempat_lahir=:tempat_lahir, tanggal_lahir=:tanggal_lahir, jabatan=:jabatan, alamat=:alamat, foto=:foto, periode_awal=:periode_awal, periode_akhir=:periode_akhir
-                    WHERE id=:id";
-            $params = array(
-                ":id" => $id,
-                ":nama" => $nama,
-                ":tempat_lahir" => $tempat_lahir,
-                ":tanggal_lahir" => $tanggal_lahir,
-                ":jabatan" => $jabatan,
-                ":alamat" => $alamat,
-                ":foto" => $foto,
-                ":periode_awal" => $periode_awal,
-                ":periode_akhir" => $periode_akhir,
-            );
-            $app->query($sql, $params);
+            if ($foto == "") {
+                // foto tidak diubah
+                $sql = "UPDATE perangkat_desa
+                        SET nama=:nama, tempat_lahir=:tempat_lahir, tanggal_lahir=:tanggal_lahir, jabatan=:jabatan, no_hp=:no_hp, no_sk=:no_sk, alamat=:alamat, nipd=:nipd, periode_awal=:periode_awal, periode_akhir=:periode_akhir
+                        WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":tempat_lahir" => $tempat_lahir,
+                    ":tanggal_lahir" => $tanggal_lahir,
+                    ":jabatan" => $jabatan,
+                    ":no_hp" => $no_hp,
+                    ":no_sk" => $no_sk,
+                    ":alamat" => $alamat,
+                    ":nipd" => $nipd,
+                    ":periode_awal" => $periode_awal,
+                    ":periode_akhir" => $periode_akhir,
+                );
+                $app->query($sql, $params);
+            } else {
+                // foto diubah
+                $sql = "UPDATE perangkat_desa
+                        SET nama=:nama, tempat_lahir=:tempat_lahir, tanggal_lahir=:tanggal_lahir, jabatan=:jabatan, no_hp=:no_hp, no_sk=:no_sk, alamat=:alamat, nipd=:nipd, foto=:foto, periode_awal=:periode_awal, periode_akhir=:periode_akhir
+                        WHERE id=:id";
+                $params = array(
+                    ":id" => $id,
+                    ":nama" => $nama,
+                    ":tempat_lahir" => $tempat_lahir,
+                    ":tanggal_lahir" => $tanggal_lahir,
+                    ":jabatan" => $jabatan,
+                    ":no_hp" => $no_hp,
+                    ":no_sk" => $no_sk,
+                    ":alamat" => $alamat,
+                    ":nipd" => $nipd,
+                    ":foto" => $foto,
+                    ":periode_awal" => $periode_awal,
+                    ":periode_akhir" => $periode_akhir,
+                );
+                $app->query($sql, $params);
+            }
         }
 
         $view = new PerangkatView();
@@ -215,7 +248,7 @@ class PerangkatView
                                 <input type="hidden" name="id" value="<?= $result->id; ?>">
                                 <div class=" card-body">
                                     <div class="form-group">
-                                        <label for="nama" class="form-label">Nama:</label>
+                                        <label for="nama" class="form-label">Nama: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama" value="<?= $result->nama; ?>" required autofocus>
                                     </div>
                                     <div class=" form-group">
@@ -227,16 +260,28 @@ class PerangkatView
                                         <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="<?= $result->tanggal_lahir; ?>">
                                     </div>
                                     <div class=" form-group">
-                                        <label for="jabatan" class="form-label">Jabatan:</label>
+                                        <label for="jabatan" class="form-label">Jabatan: <i class="text-danger">*</i></label>
                                         <input type="text" class="form-control" id="jabatan" name="jabatan" placeholder="Masukkan jabatan" value="<?= $result->jabatan; ?>" required>
                                     </div>
                                     <div class=" form-group">
-                                        <label for="alamat" class="form-label">Alamat:</label>
+                                        <label for="no_hp" class="form-label">No. HP: <i class="text-danger">*</i></label>
+                                        <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Masukkan nomor HP" value="<?= $result->no_hp; ?>" maxlength="13" required>
+                                    </div>
+                                    <div class=" form-group">
+                                        <label for="no_sk" class="form-label">No. SK Pengangkatan: <i class="text-danger">*</i></label>
+                                        <input type="text" class="form-control" id="no_sk" name="no_sk" placeholder="Masukkan nomor SK pengangkatan" value="<?= $result->no_sk; ?>" required>
+                                    </div>
+                                    <div class=" form-group">
+                                        <label for="alamat" class="form-label">Alamat: <i class="text-danger">*</i></label>
                                         <textarea class="form-control" id="alamat" name="alamat" placeholder="Masukkan alamat" required><?= $result->alamat; ?></textarea>
                                     </div>
+                                    <div class=" form-group">
+                                        <label for="nipd" class="form-label">NIPD: <i class="text-danger">*</i></label>
+                                        <input type="text" class="form-control" id="nipd" name="nipd" placeholder="Masukkan NIPD" value="<?= $result->nipd; ?>" required>
+                                    </div>
                                     <div class="form-group">
-                                        <label for="foto" class="form-label">Foto Profil:</label>
-                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                                        <label for="foto" class="form-label">Foto Profil: <i class="text-danger">*</i></label>
+                                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*" <?= $result->id == 0 ? "required" : ""; ?>>
                                     </div>
                                     <div class="form-group">
                                         <label for="periode_awal" class="form-label">Periode Awal Masa Jabatan:</label>
@@ -303,14 +348,16 @@ class PerangkatView
                                 </div>
                             </div>
                             <div class="card-body">
-                                <table id="example2" class="table table-bordered table-hover">
+                                <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Nama</th>
                                             <th>Tempat, Tanggal Lahir</th>
                                             <th>Jabatan</th>
+                                            <th>NO HP</th>
+                                            <th>NO SK Pengangkatan</th>
                                             <th>Alamat</th>
-                                            <th>Periode Masa Jabatan</th>
+                                            <th>NIPD</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -332,13 +379,16 @@ class PerangkatView
                                                         <?= $obj->jabatan; ?>
                                                     </td>
                                                     <td>
+                                                        <?= $obj->no_hp; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $obj->no_sk; ?>
+                                                    </td>
+                                                    <td>
                                                         <?= $obj->alamat; ?>
                                                     </td>
                                                     <td>
-                                                        <?php if ($obj->periode_awal != 0 && $obj->periode_akhir != 0) { ?>
-                                                            <?= $obj->periode_awal; ?> -
-                                                            <?= $obj->periode_akhir; ?>
-                                                        <?php } ?>
+                                                        <?= $obj->nipd; ?>
                                                     </td>
                                                     <td>
                                                         <a href="<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/edit/<?= $obj->id; ?>" class="badge btn-info">
@@ -354,7 +404,7 @@ class PerangkatView
                                         } else {
                                             ?>
                                             <tr>
-                                                <td colspan="6" class="text-center">Tidak ada</td>
+                                                <td colspan="8" class="text-center">Tidak ada data</td>
                                             </tr>
                                         <?php
                                         }
@@ -370,19 +420,16 @@ class PerangkatView
         <!-- Page specific script -->
         <script>
             $(function() {
-                $('#example2').DataTable({
-                    "paging": true,
-                    "lengthChange": false,
-                    "searching": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
+                $("#example1").DataTable({
                     "responsive": true,
-                });
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             });
 
             function confirmDelete(id) {
-                if (confirm("Apakah anda yakin ingin menghapus pengguna ini?")) {
+                if (confirm("Apakah Anda yakin ingin menghapus perangkat desa ini?")) {
                     window.open("<?= $app->siteUrl; ?>/admin/<?= $app->component; ?>/delete/" + id, '_self');
                 }
             }
@@ -415,7 +462,7 @@ class PerangkatView
                     ?>
                             <div class="col-lg-3 col-sm-6 col-12">
                                 <!-- START: Card Perangkat -->
-                                <div class="card card-cascade my-bg-primary text-white">
+                                <div class="card card-cascade my-bg-secondary text-white">
                                     <!-- Card image -->
                                     <div class="view view-cascade overlay">
                                         <img class="card-img-top card-profile-img" src="<?= $app->siteUrl; ?>/uploads/perangkat/<?= $obj->foto; ?>" alt="Card image cap">
@@ -429,10 +476,10 @@ class PerangkatView
                                         <h4 class="card-title fw-bold">
                                             <?= $obj->nama; ?>
                                         </h4>
-                                        <!-- Subtitle -->
-                                        <h6 class="font-weight-bold indigo-text py-2">
-                                            <?= $obj->jabatan; ?>
-                                        </h6>
+                                    </div>
+                                    <!-- Card footer -->
+                                    <div class="card-footer text-white text-center">
+                                        <p class="mb-0"><?= $obj->jabatan; ?></p>
                                     </div>
                                 </div>
                                 <!-- END: Card Perangkat -->

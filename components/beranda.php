@@ -88,7 +88,7 @@ class BerandaModel
 
         $sql = "SELECT *
                 FROM perangkat_desa
-                ORDER BY nama";
+                ORDER BY id";
         $result = $app->queryArrayOfObjects($sql);
         return $result;
     }
@@ -99,7 +99,7 @@ class BerandaModel
 
         $sql = "SELECT *
                 FROM bpd
-                ORDER BY nama";
+                ORDER BY id";
         $result = $app->queryArrayOfObjects($sql);
         return $result;
     }
@@ -210,7 +210,7 @@ class BerandaView
                     <div class="d-flex justify-content-center align-items-center h-100" style="margin-top: 250px;">
                         <div class="text-white">
                             <h1 class="mb-3 fw-bold">Selamat Datang di Web Desa Teluk Jira</h1>
-                            <h4 class="mb-3">Kecamatan Tempuling Kabupaten Indragiri Hilir</h4>
+                            <h4 class="mb-3">Kecamatan Tempuling Kabupaten Indragiri Hilir Provinsi Riau</h4>
                         </div>
                     </div>
                 </div>
@@ -299,10 +299,10 @@ class BerandaView
                                         <h4 class="card-title fw-bold">
                                             <?= $obj->nama; ?>
                                         </h4>
-                                        <!-- Subtitle -->
-                                        <h6 class="font-weight-bold indigo-text py-2">
-                                            <?= $obj->jabatan; ?>
-                                        </h6>
+                                    </div>
+                                    <!-- Card footer -->
+                                    <div class="card-footer text-center">
+                                        <p class="mb-0"><?= $obj->jabatan; ?></p>
                                     </div>
                                 </div>
                                 <!-- END: Card Perangkat -->
@@ -347,9 +347,13 @@ class BerandaView
                                             <?= $obj->nama; ?>
                                         </h4>
                                         <!-- Subtitle -->
-                                        <h6 class="font-weight-bold indigo-text py-2">
+                                        <h6 class="font-weight-bold indigo-text pt-2">
                                             <?= $obj->jabatan; ?>
                                         </h6>
+                                    </div>
+                                    <!-- Card footer -->
+                                    <div class="card-footer text-white text-center">
+                                        <p class="mb-0"><?= $obj->awal_masa_bakti; ?> - <?= $obj->akhir_masa_bakti; ?></p>
                                     </div>
                                 </div>
                                 <!-- END: Card Perangkat -->
